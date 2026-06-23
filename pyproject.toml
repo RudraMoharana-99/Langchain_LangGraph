@@ -13,4 +13,7 @@ dependencies = [
     "langchain-tavily>=0.2.18",
     "python-dotenv>=1.2.2",
     "tavily-python>=0.7.26",
+    "langchain-community>=0.3.27",
+    "langchain-pinecone>=0.2.11",
+    "langchainhub>=0.1.21"
 ]

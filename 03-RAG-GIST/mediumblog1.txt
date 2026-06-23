@@ -1,0 +1,186 @@
+With the rise of Large Language Models (LLMs), the ability to effectively process and analyze diverse data types (images, video, text, audio, and more) has become increasingly critical. Embeddings have emerged as a cornerstone of modern machine learning, offering a powerful solution to this challenge by transforming heterogeneous data into a unified format suitable for a wide array of applications. In this article, we will explore the fascinating world of embeddings, covering various embedding techniques, how to manage and query embeddings at scale, and real-world applications.
+
+What are Embeddings?
+Embeddings are low-dimensional numerical vector representations of real-world data like text, images, audio, and video. They provide:
+
+Compact representation: Embeddings act as a means of lossy compression of the original data while retaining its essential properties, facilitating efficient large-scale data processing and storage.
+Semantic meaning: The geometric distances between two vectors in the embedding space reflect the relationships between the real-world objects they represent. This allows for comparing the similarity or difference between data objects of different types on a numerical scale.
+Imagine compressing a complex image or a lengthy document into a concise numerical vector that retains its core meaning — this is the magic of embeddings. By projecting diverse data types into a common vector space, multimodal embeddings can be directly used as input for machine learning models, providing a powerful representation of the data.
+
+Press enter or click to view image in full size
+
+Projecting objects/content into a joint vector space with semantic meaning. Intra-modality refers to relationships or interactions within the same modality. Inter-modality refers to relationships or interactions between different modalities.
+Types of Embeddings
+Let’s explore some standard embedding techniques for different data types:
+
+1. Text Embeddings
+Word Embeddings:
+Word Embeddings capture the semantic meaning of individual words by leveraging the principle that a word’s meaning is defined by its neighbors in a corpus. Words with similar meanings should have similar embeddings. For instance, the word “computer” should have an embedding that is similar to the embeddings of words like “laptop” and “PC”, but different from the embedding of a word like “car”.
+
+These are some of the most popular algorithms:
+
+Word2Vec: This algorithm can be further divided into two different techniques:
+- The Continuous bag of words (CBOW) approach: Tries to predict the middle word, using the embeddings of the surrounding words as input. This method is agnostic to the order of the surrounding words in the context. This approach is fast to train and is slightly more accurate for frequent words.
+- The skip-gram approach: The setup is inverse of that of CBOW, with the middle word being used to predict the surrounding words within a certain range. This approach is slower to train but works well with small data and is more accurate for rare words.
+GloVe (Global Vectors for Word Representation): Unlike Word2Vec, Glove not only captures local statistics (close words) but it also captures the global statistics (words in the whole corpus). It does this by first creating a co-occurrence matrix, which represents the relationships between words. Then it uses a factorization technique to learn word representations from the co-occurrence matrix.
+SWIVEL (Skip-Window Vectors with Negative Sampling): It uses a co-occurrence matrix like GloVe but introduces optimizations that make the training process more scalable and efficient. However, it is slightly less accurate than GloVe.
+Press enter or click to view image in full size
+
+2D visualization of pre-trained GloVe and Word2Vec word embeddings
+Document Embeddings:
+Document Embeddings represent entire documents or paragraphs as vectors, capturing the meaning of a sequence of words.
+
+The early methods of document embeddings relied on the Bag-of-Words (BoW) paradigm. These models treat a document as an unordered collection of words and do not consider the order of words or the relationships between them. Some of the popular algorithms include:
+
+Latent Semantic Analysis (LSA): This technique analyses the co-occurrence of words in documents to create a lower-dimensional representation of the document’s meaning.
+Latent Dirichlet Allocation (LDA): LDA is a probabilistic model that represents documents as mixtures of topics, where each topic is a distribution over words.
+TF-IDF (Term Frequency-Inverse Document Frequency): TF-IDF is a statistical measure that reflects the importance of a word in a document relative to a collection of documents. In other words, it evaluates words based on how often they appear in the document.
+Doc2Vec: This model, inspired by Word2Vec, attempts to address the limitations of traditional BoW: both the word ordering and the semantic meanings are ignored. To fix this, Doc2Vec adds a “paragraph embedding” to the Word2Vec model. This embedding is trained along with word embeddings to predict words within the document, allowing it to capture some contextual information.
+In contrast, the latest approaches for document embeddings utilize pre-trained language models, which harness the power of transformers and large-scale datasets. Some of the most popular algorithms include:
+
+BERT (Bidirectional Encoder Representations from Transformers): BERT was a groundbreaking model that achieved state-of-the-art results on various NLP tasks in 2018. It is an encoder-only transformer model that utilizes a masked language modeling objective during pre-training, which involves randomly masking some words in the input and training the model to predict the masked words based on the surrounding context. This allows BERT to learn bidirectional representations of words.
+RoBERTa (Robustly Optimized BERT Pre-Training Approach): RoBERTa is an improved variant of the original BERT model. It enhances BERT’s performance by making several optimizations during pre-training, including more data and training times.
+Sentence-BERT: Sentence-BERT is specifically designed for sentence embedding tasks. It builds upon BERT’s architecture and is fine-tuned to produce semantically meaningful sentence embeddings.
+SimCSE (Simple Contrastive Learning of Sentence Embeddings): SimCSE utilizes a contrastive learning approach to train sentence embeddings. It generates positive and negative example pairs from the input sentences and trains the model to maximize the similarity between positive pairs while minimizing the similarity between negative pairs.
+T5 (Text-to-Text Transfer Transformer): T5 is a large language model that frames all NLP tasks as text-to-text problems. T5 uses an encoder-decoder architecture and it is known for being very versatile in handling NLP tasks.
+Can Gemini, GPT, Llama or other decoder-only architectures be used for generating document embeddings?
+
+In general, generative, auto-regressive models aren’t well suited for embeddings because their understanding of the input is spread out over multiple hidden states. It is better to use a model that has been trained with the specific purpose of producing embeddings. Typically this is a transformer encoder, and in such cases you take the hidden state from the last layer of the last “end of sequence” token. This means that the model’s understanding is concentrated in a single place. More details can be found in this paper:
+
+arXiv:2201.10005v1 [cs.CL] 24 Jan 2022
+
+2. Image embeddings
+One of the most popular methods to derive image embeddings is by training a CNN or Vision Transformer model on a large scale image classification task (for example, ImageNet), and then using the penultimate layer as the image embedding. If successful, this layer will have learnt some important discriminative feature maps. These feature maps represent learned visual patterns that are crucial for image classification or other image tasks.
+
+3. Multimodal Embeddings
+To obtain multimodal embeddings, individual unimodal embeddings (e.g., text embeddings and image embeddings) are combined, taking into account the semantic relationships between the modalities. These relationships are typically learned via a separate training process that aligns the embeddings into a shared latent space.
+
+This process ensures that data from different modalities (text, images, audio, video, etc.) are represented in a fixed-size semantic vector in the same latent space, enabling direct comparison and integration. The training often involves techniques such as contrastive learning, where paired data points (e.g., an image and its associated caption) are brought closer in the embedding space, while non-matching pairs are pushed apart. This alignment captures both intra-modality (e.g., relationships within text or within images) and inter-modality (e.g., relationships between text and images) semantics.
+
+4. Structured Data Embeddings
+When dealing with structured data — that is, data organized in rows and columns — it is necessary to create a custom embedding model tailored to its specific application. In other words, in these cases, it is rare to find a pre-trained embedding model that can be directly used. We can find two common cases:
+
+General Structured Data: Embeddings for structured data like sensor data or tabular data can be generated using dimensionality reduction techniques like PCA. These embeddings can be used for anomaly detection and as inputs for downstream machine learning tasks.
+User/Item Structured Data: This type of structured data goes beyond a general data table. It includes multiple interconnected components: user data (e.g., demographics, preferences, or behaviors), item/product data (e.g., attributes like category, price, or brand), and data that describes the interaction between users and items (e.g., ratings, clicks, or purchase history).
+The primary goal of working with such data is to map both users and items into a shared embedding space, enabling recommender systems to predict interactions effectively. By representing users and items as fixed-size embeddings, the system can measure their similarity or relevance, making it possible to recommend the most suitable items for each user. One popular technique for this is Collaborative Filtering.
+5. Graph Embeddings:
+Graph embeddings are a way to represent nodes, edges, or entire graphs as fixed-size numerical vectors while preserving the structural and relational information inherent in the graph. These embeddings capture both the local (neighborhood) and global (overall structure) properties of the graph, enabling various downstream tasks like node classification, clustering, link prediction, recommendation systems, and more.
+
+Take an example of a social network where each person is a node, and the connections between people are defined as edges. Using graph embedding you can model each node as an embedding, such that the embedding captures not only the semantic information about the person itself, but also its relations and associations hence enriching the embedding. For example, if two nodes are connected by an edge, the vectors for those nodes would be similar. You might then be able to predict who the person is most similar to and recommend new connections.
+
+Popular algorithms for graph embedding include DeepWalk, Node2vec, LINE, and GraphSAGE.
+
+Training Embeddings
+Modern embedding models often employ a dual encoder architecture, also known as a two-tower architecture, for training. In this setup, two separate neural networks, or “towers,” are used to encode different aspects of the data. For example, for the text embedding model used in question-answering, one tower is used to encode the queries and the other tower is used to encode the documents. For the image and text embedding model, one tower is used to encode the images and the other tower is used to encode the text.
+
+The training process typically involves a contrastive loss, a type of loss function that encourages the model to bring positive examples (semantically similar pairs) closer together in the embedding space while pushing negative examples (dissimilar pairs) further apart.
+
+Similar to LLMs training, the training of an embedding model from scratch includes two stages:
+
+Pre-training: In this unsupervised phase, the model learns general representations from a massive amount of unlabeled data.
+Fine-tuning: This supervised phase involves training the model on a smaller, labeled dataset specific to the downstream task. Fine-tuning helps adapt the model’s representations to the specific nuances of the target application.
+Remember, for unstructured data, pre-trained embeddings are typically available and can be directly used. But you may want to fine-tune them for domain-specific applications.
+
+Vector databases
+Once embeddings are created, the next challenge lies in efficiently storing and retrieving them. Historically, traditional databases lacked the means to combine semantic meaning and efficient querying in a way that the most relevant embeddings can be both stored, queried, and retrieved in a secure, scalable, and flexible manner. This is what gave rise to vector databases: specialized systems designed to manage and query embeddings at scale.
+
+Become a Medium member
+Each vector database differs in its implementation, but the general flow is shown in the following figure:
+
+Press enter or click to view image in full size
+
+An appropriate trained embedding model is used to embed the relevant data points as vectors with fixed dimensions.
+The vectors are then augmented with appropriate metadata and complementary information (such as tags) and indexed using the specified algorithm for efficient search.
+An incoming query gets embedded with the same model, and used to query and return specific amounts of the most semantically similar items and their associated unembedded content/metadata. Some databases might provide caching and pre-filtering (based on tags) and post-filtering capabilities (reranking using another more accurate model) to further enhance the query speed and performance.
+A few good examples of commercially managed vector databases are
+
+Google Vertex AI Vector Search
+Pinecone
+And some open-source examples are:
+
+Weaviate
+Chroma
+Vector search
+Vector search is the lifeblood of vector databases. It’s the mechanism that allows these databases to unlock the power of semantic similarity and deliver highly relevant results.
+
+Traditional vector search algorithms relied on keyword matching, which made them slow, difficult to scale, and incapable of returning results that did not exactly match the query’s keywords. In contrast, modern vector search techniques leverage embeddings to retrieve information based on semantic similarity, using metrics such as Euclidean distance, cosine similarity, or dot product. In other words, vector search methods identify the items in the database that are most similar to the given query based on their vector representations.
+
+Approximate Nearest Neighbor Search
+One of the most popular techniques for vector search is Approximate Nearest Neighbor (ANN) Search. ANN refers to a collection of algorithms designed to efficiently identify the closest (most similar) vectors in high-dimensional spaces.
+
+Why ANN?
+In vector databases (high-dimensional spaces), the computational cost of exact nearest neighbor (NN) searches grows exponentially with the size of the dataset and the number of dimensions. Instead, what ANN algorithms do is to trade off exact accuracy for speed and scalability, delivering results that are “good enough” in a fraction of the time.
+
+Popular ANN algorithms include:
+
+1. Hierarchical Navigable Small Worlds (HNSW)
+Strengths:
+- Extremely fast with high accuracy.
+- Scalable for large datasets.
+- Flexible in adapting to different similarity measures.
+
+Use Cases: General-purpose ANN tasks, recommendation systems, and high-dimensional vector retrieval.
+
+Tools: Integrated into libraries like FAISS and nmslib.
+
+2. Scalable Approximate Nearest Neighbor (ScaNN)
+Strengths:
+- Optimized for industrial-scale datasets.
+- Combines partitioning, approximate distance computation, and optional rescoring for top-tier speed-accuracy trade-offs.
+- Handles both dense and sparse vectors effectively.
+
+Use Cases: Google-scale applications, such as search and retrieval for embeddings.
+
+Tools: ScaNN.
+
+3. Annoy (Approximate Nearest Neighbors)
+Strengths:
+- Lightweight and simple to use.
+- Optimized for memory-mapped storage, making it great for static datasets.
+
+Use Cases: Recommendation systems, especially for smaller datasets or use cases where memory efficiency is key.
+
+Tools: Annoy.
+
+4. FAISS (Facebook AI Similarity Search)
+Strengths:
+- Comprehensive library supporting multiple ANN algorithms, including HNSW, IVFPQ (Inverted File Index with Product Quantization), and LSH.
+- Highly optimized for both CPU and GPU, making it ideal for large-scale searches.
+
+Use Cases: Large datasets with billions of vectors, real-time recommendations.
+
+Tools: FAISS.
+
+5. Locality Sensitive Hashing (LSH)
+Strengths:
+- Excellent for very high-dimensional sparse data.
+- Simple to implement and well-understood.
+
+Use Cases: Text search, genomic data, or any use case requiring radius-based similarity search.
+
+Tools: Available in libraries like scikit-learn and datasketch.
+
+Use case: Building a Knowledge-Intensive LLM with RAG and Vector Databases
+Imagine you’re building a customer support chatbot that needs to provide accurate and up-to-date answers to customer queries. To achieve this, you can leverage a combination of LLMs, Retrieval Augmented Generation (RAG), and vector databases.
+
+Here’s a breakdown of the process:
+
+1. Data Preparation:
+Document Collection: Gather relevant documents like FAQs, product manuals, and customer support logs.
+Vectorization: Use a language model (e.g., BERT, RoBERTa) to convert each document into a dense vector representation. This vector captures the semantic meaning of the text.
+2. Vector Database:
+Indexing: Store these vectors in a vector database (e.g., Pinecone, Weaviate, Chroma). This database is optimized for efficient similarity search.
+3. RAG System:
+Query Processing: When a customer asks a question, convert it into a vector representation using the same language model.
+Retrieval: Query the vector database to find the most similar documents to the query vector.
+Augmentation: Combine the retrieved documents with the original query and feed them into the LLM.
+4. LLM Response Generation:
+The LLM processes the augmented prompt and generates a comprehensive and informative response.
+The response can be a direct answer to the query, a summary of relevant information, or a combination of both.
+Conclusion
+Embeddings have revolutionized the way we work with diverse data in machine learning. Their ability to capture semantic relationships, facilitate efficient comparisons, and serve as inputs for various models has opened up a world of possibilities. By choosing the right embedding technique, vector database, and search algorithm, developers can unlock the full potential of embeddings to build powerful applications.
+
+Key use cases, such as semantic search, recommendation systems, anomaly detection, and LLMs with RAG, showcase the versatility of embeddings in addressing complex challenges. As the technology continues to evolve, embeddings will remain a fundamental building block for advancing AI-driven solutions.
+
+If you’re interested in related content, I recommend reading my next article, Introduction to AI Agents. It explores the world of AI agents, covering its architecture, core components, and implementation for real-world applications.
+
