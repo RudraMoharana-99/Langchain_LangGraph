@@ -165,3 +165,5 @@ marimo/_lsp/
 __marimo__/
 # Streamlit
 .streamlit/secrets.toml
+# Chroma
+chroma_db/

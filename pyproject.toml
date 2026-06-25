@@ -15,5 +15,6 @@ dependencies = [
     "tavily-python>=0.7.26",
     "langchain-community>=0.3.27",
     "langchain-pinecone>=0.2.11",
-    "langchainhub>=0.1.21"
+    "langchainhub>=0.1.21",
+    "langchain-chroma>=1.1.0",
 ]
